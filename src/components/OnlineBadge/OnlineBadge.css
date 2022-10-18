@@ -1,0 +1,24 @@
+
+.online-fab {
+  margin-top: 5px;
+}
+
+.online-fab > button {
+  display: flex;
+  align-items: center;
+  padding: 5px 15px;
+  background-color: grey;
+  border-radius: 10px;
+}
+
+.online-fab > button:active {
+  box-shadow: 2px 2px 5px #333;
+}
+
+.modal-buttons {
+  margin-right: -100%;
+}
+
+.modal-title {
+  text-align: center;
+}
