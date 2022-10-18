@@ -23,7 +23,10 @@ const BlogCard: React.FC<IBlogCard> = ({ data }) => {
             <Link to={createBlogPageRoute({ id: data?.id ?? '' })}>
               <Avatar src={data?.avatarSrc} alt={data?.username} />
             </Link>
-            <Link to={createBlogPageRoute({ id: data?.id ?? '' })}>
+            <Link
+              style={{ maxWidth: '70%' }}
+              to={createBlogPageRoute({ id: data?.id ?? '' })}
+            >
               <IonCardTitle style={{ marginLeft: '10px' }}>
                 <div className="overflow-elipsis">{data?.username}</div>
               </IonCardTitle>

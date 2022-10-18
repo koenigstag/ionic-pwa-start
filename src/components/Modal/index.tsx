@@ -8,6 +8,7 @@ import {
   IonToolbar,
 } from '@ionic/react';
 import React, { FC } from 'react';
+import { capitalizeFirstLitter } from '../../utils/util-functions';
 import Container from '../Container';
 
 export interface IModal {
@@ -29,7 +30,7 @@ const Modal = React.forwardRef<HTMLIonModalElement, IModal>(
                 CLOSE
               </IonButton>
             </IonButtons>
-            <IonTitle className="modal-title">{title}</IonTitle>
+            <IonTitle className="modal-title">{capitalizeFirstLitter(title)}</IonTitle>
           </IonToolbar>
         </IonHeader>
 

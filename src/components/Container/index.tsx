@@ -1,3 +1,4 @@
+import { isPlatform } from '@ionic/core';
 import Hideable from '../Hideable';
 import './Container.css';
 
@@ -8,10 +9,12 @@ interface ContainerProps {
 }
 
 const Container: React.FC<ContainerProps> = ({ style, children, name }) => {
+  const isIOS = isPlatform('ios');
+
   return (
     <div style={style} className="container">
       <Hideable show={!!name}>
-        <strong>{name}</strong>
+        <strong className={isIOS ? 'title-ios' : ''}>{name}</strong>
       </Hideable>
       {children}
     </div>

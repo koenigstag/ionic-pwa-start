@@ -8,18 +8,21 @@ import {
   IonBackButton,
   IonButtons,
   IonButton,
+  isPlatform,
 } from '@ionic/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
 import CommentList from '../../components/CommentList';
 import Container from '../../components/Container';
+import Hideable from '../../components/Hideable';
 import Modal from '../../components/Modal';
 import { createBlogPageRoute, homePageRoute } from '../../constants/routes';
 import { commentService, postService, userService } from '../../dataServices';
 import { CommentDto } from '../../models/dto/Comment.dto';
 import { PostDto } from '../../models/dto/Post.dto';
 import { UserDto } from '../../models/dto/User.dto';
+import { capitalizeFirstLitter } from '../../utils/util-functions';
 
 export interface IPost {
   data: PostDto;
@@ -68,6 +71,8 @@ const PostPage: React.FC<IPost> = ({ data }) => {
     };
   }, [closeModal]);
 
+  const isIOS = isPlatform('ios');
+
   return (
     <IonPage>
       <IonHeader>
@@ -76,10 +81,17 @@ const PostPage: React.FC<IPost> = ({ data }) => {
             <IonBackButton defaultHref={homePageRoute}></IonBackButton>
           </IonButtons>
           <div style={{ display: 'flex' }}>
-            <Link to={createBlogPageRoute({ id: author?.id ?? '' })}>
-              <Avatar src={author?.avatarSrc} alt={author?.name} />
-            </Link>
-            <IonTitle className="overflow-elipsis">{post?.title}</IonTitle>
+            <Hideable hide={isIOS}>
+              <Link to={createBlogPageRoute({ id: author?.id ?? '' })}>
+                <Avatar src={author?.avatarSrc} alt={author?.name} />
+              </Link>
+            </Hideable>
+            <IonTitle
+              style={{ padding: '0 10px' }}
+              className="overflow-elipsis"
+            >
+              {capitalizeFirstLitter(author?.username)}
+            </IonTitle>
           </div>
           <IonChip slot="end">ID: {id}</IonChip>
         </IonToolbar>
@@ -87,17 +99,22 @@ const PostPage: React.FC<IPost> = ({ data }) => {
       <IonContent fullscreen>
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large" className="overflow-elipsis">
-              {post?.title}
-            </IonTitle>
+            <Link to={createBlogPageRoute({ id: author?.id ?? '' })}>
+              <IonTitle size="large" className="overflow-elipsis">
+                {author?.username} {author?.name ? `(${author?.name})` : ''}
+              </IonTitle>
+            </Link>
           </IonToolbar>
         </IonHeader>
 
         <Container>
-          <div className="line-clamp">{post?.body}</div>
+          <div style={{ fontWeight: 'bold', padding: '10px 0px' }}>
+            {capitalizeFirstLitter(post?.title)}
+          </div>
+          <div>{capitalizeFirstLitter(post?.body)}</div>
         </Container>
 
-        <IonButtons>
+        <IonButtons style={{ marginTop: '25px' }}>
           <IonButton id="open-comments-btn">Comments</IonButton>
         </IonButtons>
 

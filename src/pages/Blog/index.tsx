@@ -7,13 +7,15 @@ import {
   IonPage,
   IonTitle,
   IonToolbar,
+  isPlatform,
 } from '@ionic/react';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
 import Container from '../../components/Container';
+import Hideable from '../../components/Hideable';
 import PostCard from '../../components/PostCard';
-import { homePageRoute } from '../../constants/routes';
+import { createBlogPageRoute, homePageRoute } from '../../constants/routes';
 import { postService, userService } from '../../dataServices';
 import { PostDto } from '../../models/dto/Post.dto';
 import { UserDto } from '../../models/dto/User.dto';
@@ -46,6 +48,8 @@ const BlogPage: React.FC<IBlogPage> = ({ data }) => {
     }
   }, [blog, data, id]);
 
+  const isIOS = isPlatform('ios');
+
   return (
     <IonPage>
       <IonHeader>
@@ -54,8 +58,14 @@ const BlogPage: React.FC<IBlogPage> = ({ data }) => {
             <IonBackButton defaultHref={homePageRoute}></IonBackButton>
           </IonButtons>
           <div style={{ display: 'flex' }}>
-            <Avatar src={blog?.avatarSrc} alt={blog?.username} />
-            <IonTitle>{blog?.username}'s blog</IonTitle>
+            <Hideable hide={isIOS}>
+              <Link to={createBlogPageRoute({ id: blog?.id ?? '' })}>
+                <Avatar src={blog?.avatarSrc} alt={blog?.username} />
+              </Link>
+            </Hideable>
+            <IonTitle style={{ paddingLeft: '10px', maxWidth: '75%' }}>
+              {blog?.username}'s blog
+            </IonTitle>
           </div>
           <IonChip slot="end">ID: {id}</IonChip>
         </IonToolbar>
@@ -68,12 +78,12 @@ const BlogPage: React.FC<IBlogPage> = ({ data }) => {
         </IonHeader>
 
         <Container name="Info">
-          <div>
-            <div>Fullname: {blog?.name}</div>
-            <div>Email: {blog?.email}</div>
-            <div>Website: {blog?.website}</div>
-            <div>Phone: {blog?.phone}</div>
-          </div>
+          <ul style={{ paddingLeft: '35px' }}>
+            <li>Fullname: {blog?.name}</li>
+            <li>Email: {blog?.email}</li>
+            <li>Website: {blog?.website}</li>
+            <li>Phone: {blog?.phone}</li>
+          </ul>
         </Container>
         <Container name="Posts">
           {posts?.map((post) => (
