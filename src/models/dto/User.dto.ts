@@ -8,5 +8,9 @@ export interface UserDto {
   avatarSrc?: string;
 
   address?: object;
-  company?: object;
+  company?: {
+    name: string;
+    catchPhrase: string;
+    bs: string;
+  };
 }

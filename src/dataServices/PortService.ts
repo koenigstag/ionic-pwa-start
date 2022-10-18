@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios';
-import { PostDto } from '../types/Post.dto';
+import { PostDto } from '../models/dto/Post.dto';
 
 export class PostService {
   path = '/posts';
@@ -15,7 +15,7 @@ export class PostService {
     const idsParams = ids?.map((i) => `id=${i}`).join('&');
     const authorParam = `userId=${authorId}`;
 
-    const params = filter ? authorParam ? `${authorParam}&${idsParams}` : idsParams : '';
+    const params = filter ? [idsParams, authorParam].join('&') : '';
 
     return (await this.client.get(`${this.path}?${params}`)) as any;
   }

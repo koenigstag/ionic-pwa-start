@@ -45,10 +45,6 @@ export const routes: RouteConfig = [
     path: postPageRoute,
     component: PostPage,
   },
-  {
-    exact: false,
-    children: <Redirect to={homePageRoute} />,
-  },
 ];
 
 export const IonRoutes: React.FC = () => {

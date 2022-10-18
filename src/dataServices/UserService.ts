@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios';
-import { UserDto } from '../types/User.dto';
+import { UserDto } from '../models/dto/User.dto';
 
 export class UserService {
   path = '/users';
@@ -14,5 +14,13 @@ export class UserService {
     return (await this.client.get(
       `${this.path}?${ids?.map((i) => `id=${i}`).join('&')}`
     )) as any;
+  }
+
+  public async trendingBlogs(): Promise<UserDto[]> {
+    const randomIds = Array(5)
+        .fill(1)
+        .map(() => Math.floor(Math.random() * 10));
+
+    return await this.findUsers(randomIds);
   }
 }

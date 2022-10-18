@@ -1,9 +1,4 @@
 import {
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
-  IonChip,
   IonContent,
   IonHeader,
   IonPage,
@@ -11,31 +6,34 @@ import {
   IonToolbar,
 } from '@ionic/react';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import Avatar from '../../components/Avatar';
+import BlogCard from '../../components/BlogCard';
 import Container from '../../components/Container';
-import {
-  createBlogPageRoute,
-  createPostPageRoute,
-} from '../../constants/routes';
+import PostCard from '../../components/PostCard';
 import { postService, userService } from '../../dataServices';
-import { PostDto } from '../../types/Post.dto';
-import { UserDto } from '../../types/User.dto';
+import { PostDto } from '../../models/dto/Post.dto';
+import { UserDto } from '../../models/dto/User.dto';
 import './Home.css';
 
 const HomePage: React.FC = () => {
   const [trendPosts, setTrendPosts] = useState<PostDto[]>([]);
-  const [trendAuthors, setTrendAuthors] = useState<UserDto[]>([]);
+  const [trendBlogs, setTrendBlogs] = useState<UserDto[]>([]);
 
   useEffect(() => {
     (async () => {
       try {
         const posts = await postService.getTrandingPosts();
-        setTrendPosts(posts);
 
         const userIds = posts.map((p) => p.userId);
         const authors = await userService.findUsers(userIds);
-        setTrendAuthors(authors);
+
+        const postsWithAuthors = posts.map((post, index) => ({
+          ...post,
+          author: authors[index],
+        }));
+        setTrendPosts(postsWithAuthors);
+
+        const trendBlogs = await userService.trendingBlogs();
+        setTrendBlogs(trendBlogs);
       } catch (error) {}
     })();
   }, []);
@@ -55,52 +53,14 @@ const HomePage: React.FC = () => {
         </IonHeader>
 
         <Container name="Trending posts">
-          {trendPosts.map((post, index) => (
-            <Link to={createPostPageRoute({ id: post.id })}>
-              <IonCard>
-                <IonCardHeader>
-                  <IonToolbar>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <Link to={createBlogPageRoute({ id: post.userId })}>
-                        <Avatar
-                          src={trendAuthors[index]?.avatarSrc}
-                          alt={trendAuthors[index]?.name}
-                        />
-                      </Link>
-                      <IonCardTitle style={{ marginLeft: '10px' }} className="overflow-elipsis">
-                        {post.title}
-                      </IonCardTitle>
-                    </div>
-                    <IonChip slot="end">ID: {post.id}</IonChip>
-                  </IonToolbar>
-                </IonCardHeader>
-
-                <IonCardContent className="line-clamp">
-                  {post.body}
-                </IonCardContent>
-              </IonCard>
-            </Link>
-            /*{<div>
-              <div>
-                <Link to={createBlogPageRoute({ id: post.userId })}>
-                  {trendAuthors[index]?.name}
-                </Link>
-              </div>
-
-              <div>
-                <Link key={post.id} to={createPostPageRoute(post)}>
-                  {post.title}
-                </Link>
-              </div>
-            </div>}*/
+          {trendPosts.map((post) => (
+            <PostCard key={post.id} showAuthor data={post} />
           ))}
         </Container>
 
         <Container name="Blogs">
-          {[{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }].map((blog) => (
-            <Link key={blog.id} to={createBlogPageRoute(blog)}>
-              <div>{blog.id}</div>
-            </Link>
+          {trendBlogs.map((blog) => (
+            <BlogCard key={blog.id} data={blog} />
           ))}
         </Container>
       </IonContent>

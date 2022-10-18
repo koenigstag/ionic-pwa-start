@@ -1,10 +1,6 @@
 import {
   IonBackButton,
   IonButtons,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
   IonChip,
   IonContent,
   IonHeader,
@@ -13,13 +9,14 @@ import {
   IonToolbar,
 } from '@ionic/react';
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Avatar from '../../components/Avatar';
 import Container from '../../components/Container';
-import { createPostPageRoute, homePageRoute } from '../../constants/routes';
+import PostCard from '../../components/PostCard';
+import { homePageRoute } from '../../constants/routes';
 import { postService, userService } from '../../dataServices';
-import { PostDto } from '../../types/Post.dto';
-import { UserDto } from '../../types/User.dto';
+import { PostDto } from '../../models/dto/Post.dto';
+import { UserDto } from '../../models/dto/User.dto';
 
 export interface IBlogPage {
   data: UserDto;
@@ -28,14 +25,14 @@ export interface IBlogPage {
 const BlogPage: React.FC<IBlogPage> = ({ data }) => {
   const { id } = useParams<{ id: string }>();
 
-  const [author, setAuthor] = useState<UserDto | undefined>(data);
+  const [blog, setBlog] = useState<UserDto | undefined>(data);
   const [posts, setPosts] = useState<PostDto[] | undefined>([]);
 
   useEffect(() => {
     if (!data) {
       (async () => {
-        const author = await userService.findById(id);
-        setAuthor(author);
+        const blog = await userService.findById(id);
+        setBlog(blog);
 
         const posts = await postService.findPosts({ authorId: id });
         setPosts(posts);
@@ -43,10 +40,11 @@ const BlogPage: React.FC<IBlogPage> = ({ data }) => {
     } else {
       (async () => {
         const posts = await postService.findPosts({ authorId: id });
+
         setPosts(posts);
       })();
     }
-  }, [data, id]);
+  }, [blog, data, id]);
 
   return (
     <IonPage>
@@ -56,8 +54,8 @@ const BlogPage: React.FC<IBlogPage> = ({ data }) => {
             <IonBackButton defaultHref={homePageRoute}></IonBackButton>
           </IonButtons>
           <div style={{ display: 'flex' }}>
-            <Avatar src={author?.avatarSrc} alt={author?.name} />
-            <IonTitle>{author?.name}'s blog</IonTitle>
+            <Avatar src={blog?.avatarSrc} alt={blog?.username} />
+            <IonTitle>{blog?.username}'s blog</IonTitle>
           </div>
           <IonChip slot="end">ID: {id}</IonChip>
         </IonToolbar>
@@ -65,31 +63,21 @@ const BlogPage: React.FC<IBlogPage> = ({ data }) => {
       <IonContent fullscreen>
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large">{author?.name}'s blog</IonTitle>
+            <IonTitle size="large">{blog?.username}'s blog</IonTitle>
           </IonToolbar>
         </IonHeader>
 
         <Container name="Info">
           <div>
-            <div>Email: {author?.email}</div>
-            <div>Website: {author?.website}</div>
-            <div>Phone: {author?.phone}</div>
+            <div>Fullname: {blog?.name}</div>
+            <div>Email: {blog?.email}</div>
+            <div>Website: {blog?.website}</div>
+            <div>Phone: {blog?.phone}</div>
           </div>
         </Container>
         <Container name="Posts">
           {posts?.map((post) => (
-            <Link to={createPostPageRoute({ id: post.id })}>
-              <IonCard>
-                <IonCardHeader>
-                  <IonToolbar>
-                    <IonCardTitle>{post.title}</IonCardTitle>
-                    <IonChip slot="end">ID: {post.id}</IonChip>
-                  </IonToolbar>
-                </IonCardHeader>
-
-                <IonCardContent>{post.body}</IonCardContent>
-              </IonCard>
-            </Link>
+            <PostCard key={post.id} data={post} />
           ))}
         </Container>
       </IonContent>
