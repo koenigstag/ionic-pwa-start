@@ -1,4 +1,3 @@
-import { Route } from 'react-router-dom';
 import {
   IonApp,
   IonIcon,
@@ -30,25 +29,25 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import routes from './routes';
+
+import { IonRoutes } from './routes';
+import OnlineBadge from './components/OnlineBadge';
 
 setupIonicReact();
 
 const App: React.FC = () => (
   <IonApp>
+    <OnlineBadge />
     <IonReactRouter>
       <IonTabs>
         <IonRouterOutlet>
-          {routes.map((r) => (
-            <Route exact={r.exact ?? true} path={r.path}>
-              {r.children}
-            </Route>
-          ))}
+          <IonRoutes />
         </IonRouterOutlet>
+
         <IonTabBar slot="bottom">
           <IonTabButton tab="tab1" href="/tab1">
             <IonIcon icon={triangle} />
-            <IonLabel>Tab 1</IonLabel>
+            <IonLabel>Home</IonLabel>
           </IonTabButton>
           <IonTabButton tab="tab2" href="/tab2">
             <IonIcon icon={ellipse} />
