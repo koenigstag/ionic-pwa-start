@@ -1,7 +1,17 @@
 import { Redirect, Route } from 'react-router';
 import HomePage from './pages/Home';
-import Tab2 from './pages/Tab2';
-import Tab3 from './pages/Tab3';
+import FavoriteBlogsPage from './pages/FavoriteBlogs';
+import ProfilePage from './pages/Profile';
+import {
+  blogPageRoute,
+  favoriteBlogsPageRoute,
+  homePageRoute,
+  postPageRoute,
+  profilePageRoute,
+  rootRoute,
+} from './constants/routes';
+import PostPage from './pages/Post';
+import BlogPage from './pages/Blog';
 
 export type RouteObject = {
   exact?: boolean;
@@ -14,20 +24,30 @@ export type RouteConfig = RouteObject[];
 
 export const routes: RouteConfig = [
   {
-    path: ['/', '/tab1'],
+    path: [rootRoute, homePageRoute],
     component: HomePage,
   },
   {
-    path: '/tab2',
-    component: Tab2,
+    path: favoriteBlogsPageRoute,
+    component: FavoriteBlogsPage,
   },
   {
-    path: '/tab3',
-    component: Tab3,
+    path: profilePageRoute,
+    component: ProfilePage,
   },
   {
     exact: false,
-    children: <Redirect to="/" />,
+    path: blogPageRoute,
+    component: BlogPage,
+  },
+  {
+    exact: false,
+    path: postPageRoute,
+    component: PostPage,
+  },
+  {
+    exact: false,
+    children: <Redirect to={homePageRoute} />,
   },
 ];
 

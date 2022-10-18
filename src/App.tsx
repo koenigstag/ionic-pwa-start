@@ -32,35 +32,57 @@ import './theme/variables.css';
 
 import { IonRoutes } from './routes';
 import OnlineBadge from './components/OnlineBadge';
+import {
+  favoriteBlogsPageRoute,
+  homePageRoute,
+  profilePageRoute,
+  rootRoute,
+} from './constants/routes';
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <OnlineBadge />
-    <IonReactRouter>
-      <IonTabs>
-        <IonRouterOutlet>
-          <IonRoutes />
-        </IonRouterOutlet>
+const App: React.FC = () => {
+  const pathname = window.location.pathname;
 
-        <IonTabBar slot="bottom">
-          <IonTabButton tab="tab1" href="/tab1">
-            <IonIcon icon={triangle} />
-            <IonLabel>Home</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="tab2" href="/tab2">
-            <IonIcon icon={ellipse} />
-            <IonLabel>Tab 2</IonLabel>
-          </IonTabButton>
-          <IonTabButton tab="tab3" href="/tab3">
-            <IonIcon icon={square} />
-            <IonLabel>Tab 3</IonLabel>
-          </IonTabButton>
-        </IonTabBar>
-      </IonTabs>
-    </IonReactRouter>
-  </IonApp>
-);
+  return (
+    <IonApp>
+      <OnlineBadge />
+      <IonReactRouter>
+        <IonTabs>
+          <IonRouterOutlet>
+            <IonRoutes />
+          </IonRouterOutlet>
+
+          <IonTabBar slot="bottom">
+            <IonTabButton
+              selected={pathname === rootRoute || pathname === homePageRoute}
+              tab="feed"
+              href={homePageRoute}
+            >
+              <IonIcon icon={triangle} />
+              <IonLabel>Home</IonLabel>
+            </IonTabButton>
+            <IonTabButton
+              selected={pathname === favoriteBlogsPageRoute}
+              tab="favorite"
+              href={favoriteBlogsPageRoute}
+            >
+              <IonIcon icon={ellipse} />
+              <IonLabel>Favorite</IonLabel>
+            </IonTabButton>
+            <IonTabButton
+              selected={pathname === profilePageRoute}
+              tab="profile"
+              href={profilePageRoute}
+            >
+              <IonIcon icon={square} />
+              <IonLabel>Profile</IonLabel>
+            </IonTabButton>
+          </IonTabBar>
+        </IonTabs>
+      </IonReactRouter>
+    </IonApp>
+  );
+};
 
 export default App;

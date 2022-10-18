@@ -1,10 +1,11 @@
 import Comment from "../Comment";
+import { CommentDto } from "../../types/Comment.dto";
 
 export interface ICommentList {
-  list: any[];
+  list?: CommentDto[];
 };
 
-const CommentList: React.FC<ICommentList> = ({ list }) => {
+const CommentList: React.FC<ICommentList> = ({ list = [] }) => {
 
   return (
     <div>

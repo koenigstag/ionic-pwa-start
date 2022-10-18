@@ -13,6 +13,7 @@ import {
 } from '@ionic/react';
 import { airplaneOutline } from 'ionicons/icons';
 import './OnlineBadge.css';
+import { client } from '../../dataServices';
 
 export interface IOnlineBadge {}
 
@@ -21,15 +22,26 @@ const OnlineBadge: React.FC<IOnlineBadge> = (props) => {
   const [onlineStatus, setOnlineStatus] = useState(false);
 
   useLayoutEffect(() => {
+    (async () => {
+      try {
+        await client.get('/');
+      } catch (error) {
+        setShowBadge(true);
+
+        // TODO dispatch to redux store
+        setOnlineStatus(false);
+      }
+    })()
+
     window.addEventListener('offline', () => {
       setShowBadge(true);
-      // dispatch to redux store
+      // TODO dispatch to redux store
       setOnlineStatus(false);
     });
 
     window.addEventListener('online', () => {
       setShowBadge(false);
-      // dispatch to redux store
+      // TODO dispatch to redux store
       setOnlineStatus(true);
     });
   }, []);
