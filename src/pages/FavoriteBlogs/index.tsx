@@ -5,24 +5,31 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import BlogCard from '../../components/BlogCard';
 import Container from '../../components/Container';
-import { userService } from '../../dataServices';
-import { UserDto } from '../../models/dto/User.dto';
+import blogsApi from '../../dataServices/BlogApi';
+import usersApi from '../../dataServices/UserApi';
 import './FavoriteBlogs.css';
 
 const FavoriteBlogsPage: React.FC = () => {
-  // TODO redux store
-  const [favBlogs, setFavBlogs] = useState<UserDto[]>();
+  const [fetchCurrentUser, { data: currentUser }] =
+    usersApi.endpoints.getCurrentUser.useLazyQuery();
+
+  const [fetchFavBlogs, { data: favBlogs }] =
+    blogsApi.endpoints.findFavBlogs.useLazyQuery();
 
   useEffect(() => {
     (async () => {
-      const blogs = await userService.trendingBlogs();
+      if (!currentUser) {
+        await fetchCurrentUser();
+      }
 
-      setFavBlogs(blogs);
+      if ((!favBlogs || !favBlogs.length) && currentUser) {
+        await fetchFavBlogs(currentUser.id);
+      }
     })();
-  }, []);
+  }, [favBlogs, fetchFavBlogs, fetchCurrentUser, currentUser]);
 
   return (
     <IonPage>

@@ -5,38 +5,34 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import BlogCard from '../../components/BlogCard';
 import Container from '../../components/Container';
 import PostCard from '../../components/PostCard';
-import { postService, userService } from '../../dataServices';
-import { PostDto } from '../../models/dto/Post.dto';
-import { UserDto } from '../../models/dto/User.dto';
+import blogsApi from '../../dataServices/BlogApi';
+import postsApi from '../../dataServices/PostApi';
 import './Home.css';
 
 const HomePage: React.FC = () => {
-  const [trendPosts, setTrendPosts] = useState<PostDto[]>([]);
-  const [trendBlogs, setTrendBlogs] = useState<UserDto[]>([]);
+  const [fetchTrendBlogs, { data: trendBlogs }] =
+    blogsApi.endpoints.getTrendBlogs.useLazyQuery();
+
+  const [fetchTrendPosts, { data: trendPosts }] =
+    postsApi.endpoints.getTrendPosts.useLazyQuery();
 
   useEffect(() => {
     (async () => {
       try {
-        const posts = await postService.getTrandingPosts();
+        if (!trendPosts || !trendPosts.length) {
+          fetchTrendPosts();
+        }
 
-        const userIds = posts.map((p) => p.userId);
-        const authors = await userService.findUsers(userIds);
-
-        const postsWithAuthors = posts.map((post, index) => ({
-          ...post,
-          author: authors[index],
-        }));
-        setTrendPosts(postsWithAuthors);
-
-        const trendBlogs = await userService.trendingBlogs();
-        setTrendBlogs(trendBlogs);
+        if (!trendBlogs || !trendBlogs.length) {
+          fetchTrendBlogs();
+        }
       } catch (error) {}
     })();
-  }, []);
+  }, [trendBlogs, trendPosts, fetchTrendBlogs, fetchTrendPosts]);
 
   return (
     <IonPage>
@@ -52,14 +48,14 @@ const HomePage: React.FC = () => {
           </IonToolbar>
         </IonHeader>
 
-        <Container name="Trending posts">
-          {trendPosts.map((post) => (
+        <Container name="Trending Posts">
+          {trendPosts?.map((post) => (
             <PostCard key={post.id} showAuthor data={post} />
           ))}
         </Container>
 
-        <Container name="Blogs">
-          {trendBlogs.map((blog) => (
+        <Container name="Trending Blogs">
+          {trendBlogs?.map((blog) => (
             <BlogCard key={blog.id} data={blog} />
           ))}
         </Container>

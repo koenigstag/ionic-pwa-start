@@ -5,26 +5,26 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+
 import Avatar from '../../components/Avatar';
 import Container from '../../components/Container';
 import { createBlogPageRoute } from '../../constants/routes';
-import { userService } from '../../dataServices';
-import { UserDto } from '../../models/dto/User.dto';
+import usersApi from '../../dataServices/UserApi';
 import './Profile.css';
 
 const ProfilePage: React.FC = () => {
-  const [user, setUser] = useState<UserDto | undefined>();
+  const [fetchCurrentUser, { data: user }] =
+    usersApi.endpoints.getCurrentUser.useLazyQuery();
 
   useEffect(() => {
     (async () => {
-      const randomId = Math.floor(Math.random() * 10);
-
-      const user = await userService.findById(randomId);
-      setUser(user);
+      if (!user) {
+        fetchCurrentUser();
+      }
     })();
-  }, []);
+  }, [user, fetchCurrentUser]);
 
   return (
     <IonPage>
@@ -48,7 +48,11 @@ const ProfilePage: React.FC = () => {
                 <div style={{ marginLeft: '10px' }}>{user?.username}</div>
               </div>
               <Link
-                style={{ display: 'block', paddingLeft: '10px', paddingTop: '5px' }}
+                style={{
+                  display: 'block',
+                  paddingLeft: '10px',
+                  paddingTop: '5px',
+                }}
                 to={createBlogPageRoute({ id: user?.id ?? '' })}
               >
                 My Blog

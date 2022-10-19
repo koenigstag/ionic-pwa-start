@@ -9,44 +9,31 @@ import {
   IonToolbar,
   isPlatform,
 } from '@ionic/react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
+
 import Avatar from '../../components/Avatar';
 import Container from '../../components/Container';
 import Hideable from '../../components/Hideable';
 import PostCard from '../../components/PostCard';
 import { createBlogPageRoute, homePageRoute } from '../../constants/routes';
-import { postService, userService } from '../../dataServices';
-import { PostDto } from '../../models/dto/Post.dto';
-import { UserDto } from '../../models/dto/User.dto';
+import blogsApi from '../../dataServices/BlogApi';
 
-export interface IBlogPage {
-  data: UserDto;
-}
+export interface IBlogPage {}
 
-const BlogPage: React.FC<IBlogPage> = ({ data }) => {
+const BlogPage: React.FC<IBlogPage> = () => {
   const { id } = useParams<{ id: string }>();
 
-  const [blog, setBlog] = useState<UserDto | undefined>(data);
-  const [posts, setPosts] = useState<PostDto[] | undefined>([]);
+  const [fetchBlogById, { data: blog }] =
+    blogsApi.endpoints.findBlogById.useLazyQuery();
 
   useEffect(() => {
-    if (!data) {
+    if (!blog) {
       (async () => {
-        const blog = await userService.findById(id);
-        setBlog(blog);
-
-        const posts = await postService.findPosts({ authorId: id });
-        setPosts(posts);
-      })();
-    } else {
-      (async () => {
-        const posts = await postService.findPosts({ authorId: id });
-
-        setPosts(posts);
+        fetchBlogById(id);
       })();
     }
-  }, [blog, data, id]);
+  }, [blog, id, fetchBlogById]);
 
   const isIOS = isPlatform('ios');
 
@@ -86,7 +73,7 @@ const BlogPage: React.FC<IBlogPage> = ({ data }) => {
           </ul>
         </Container>
         <Container name="Posts">
-          {posts?.map((post) => (
+          {blog?.posts?.map((post) => (
             <PostCard key={post.id} data={post} />
           ))}
         </Container>

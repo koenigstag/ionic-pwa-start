@@ -7,7 +7,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
-import React, { FC } from 'react';
+import React from 'react';
 import { capitalizeFirstLitter } from '../../utils/util-functions';
 import Container from '../Container';
 

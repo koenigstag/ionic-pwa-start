@@ -10,66 +10,39 @@ import {
   IonButton,
   isPlatform,
 } from '@ionic/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
+
 import Avatar from '../../components/Avatar';
 import CommentList from '../../components/CommentList';
 import Container from '../../components/Container';
 import Hideable from '../../components/Hideable';
 import Modal from '../../components/Modal';
 import { createBlogPageRoute, homePageRoute } from '../../constants/routes';
-import { commentService, postService, userService } from '../../dataServices';
-import { CommentDto } from '../../models/dto/Comment.dto';
-import { PostDto } from '../../models/dto/Post.dto';
-import { UserDto } from '../../models/dto/User.dto';
 import { capitalizeFirstLitter } from '../../utils/util-functions';
+import postApi from '../../dataServices/PostApi';
 
-export interface IPost {
-  data: PostDto;
-}
+export interface IPost {}
 
-const PostPage: React.FC<IPost> = ({ data }) => {
+const PostPage: React.FC<IPost> = () => {
   const { id } = useParams<{ id: string }>();
 
-  const [post, setPost] = useState<PostDto | undefined>(data);
-  const [author, setAuthor] = useState<UserDto | undefined>();
-  const [comments, setComments] = useState<CommentDto[]>([]);
+  const [fetchPost, { data: post }] =
+    postApi.endpoints.findPostById.useLazyQuery();
 
   const modal = useRef<HTMLIonModalElement>(null);
 
   useEffect(() => {
-    if (!data) {
+    if (!post) {
       (async () => {
-        const post = await postService.findById(id);
-        setPost(post);
-
-        const author = await userService.findById(post.userId);
-        setAuthor(author);
-
-        const comments = await commentService.findComments({ postId: id });
-        setComments(comments);
-      })();
-    } else {
-      (async () => {
-        const author = await userService.findById(data.userId);
-        setAuthor(author);
-
-        const comments = await commentService.findComments({ postId: data.id });
-        setComments(comments);
+        fetchPost(id);
       })();
     }
-  }, [data, id]);
+  }, [post, id, fetchPost]);
 
   const closeModal = useCallback(() => {
     modal.current?.dismiss();
   }, []);
-  useEffect(() => {
-    return () => {
-      console.log('test');
-
-      closeModal();
-    };
-  }, [closeModal]);
 
   const isIOS = isPlatform('ios');
 
@@ -82,15 +55,18 @@ const PostPage: React.FC<IPost> = ({ data }) => {
           </IonButtons>
           <div style={{ display: 'flex' }}>
             <Hideable hide={isIOS}>
-              <Link to={createBlogPageRoute({ id: author?.id ?? '' })}>
-                <Avatar src={author?.avatarSrc} alt={author?.name} />
+              <Link to={createBlogPageRoute({ id: post?.author?.id ?? '' })}>
+                <Avatar
+                  src={post?.author?.avatarSrc}
+                  alt={post?.author?.name}
+                />
               </Link>
             </Hideable>
             <IonTitle
               style={{ padding: '0 10px' }}
               className="overflow-elipsis"
             >
-              {capitalizeFirstLitter(author?.username)}
+              {capitalizeFirstLitter(post?.author?.username)}
             </IonTitle>
           </div>
           <IonChip slot="end">ID: {id}</IonChip>
@@ -99,9 +75,10 @@ const PostPage: React.FC<IPost> = ({ data }) => {
       <IonContent fullscreen>
         <IonHeader collapse="condense">
           <IonToolbar>
-            <Link to={createBlogPageRoute({ id: author?.id ?? '' })}>
+            <Link to={createBlogPageRoute({ id: post?.author?.id ?? '' })}>
               <IonTitle size="large" className="overflow-elipsis">
-                {author?.username} {author?.name ? `(${author?.name})` : ''}
+                {post?.author?.username}{' '}
+                {post?.author?.name ? `(${post?.author?.name})` : ''}
               </IonTitle>
             </Link>
           </IonToolbar>
@@ -124,7 +101,7 @@ const PostPage: React.FC<IPost> = ({ data }) => {
           title="Comments"
           onClose={closeModal}
         >
-          <CommentList list={comments} />
+          <CommentList list={post?.comments} />
         </Modal>
       </IonContent>
     </IonPage>

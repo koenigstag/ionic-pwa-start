@@ -1,57 +1,45 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useLayoutEffect, useRef } from 'react';
 import { IonFab, IonIcon, IonLabel } from '@ionic/react';
 import { airplaneOutline } from 'ionicons/icons';
-import { client } from '../../dataServices';
 import Modal from '../Modal';
 import './OnlineBadge.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../app/store';
+import configService, { Config } from '../../dataServices/ConfigService';
+import { setIsOnline } from '../../app/slices/userSlice';
 
 export interface IOnlineBadge {}
 
 const OnlineBadge: React.FC<IOnlineBadge> = (props) => {
-  const [showBadge, setShowBadge] = useState(false);
-  const [onlineStatus, setOnlineStatus] = useState(false);
+  const onlineStatus = useSelector((state: RootState) => state.user.isOnline);
+  const dispatch = useDispatch();
 
   useLayoutEffect(() => {
     (async () => {
       try {
-        await client.get('/');
+        await fetch(configService.get(Config.API_URL) ?? '');
+        dispatch(setIsOnline(true));
       } catch (error) {
-        setShowBadge(true);
-
-        // TODO dispatch to redux store
-        setOnlineStatus(false);
+        dispatch(setIsOnline(false));
       }
     })();
 
     window.addEventListener('offline', () => {
-      setShowBadge(true);
-      // TODO dispatch to redux store
-      setOnlineStatus(false);
+      dispatch(setIsOnline(false));
     });
 
     window.addEventListener('online', () => {
-      setShowBadge(false);
-      // TODO dispatch to redux store
-      setOnlineStatus(true);
+      dispatch(setIsOnline(true));
     });
-  }, []);
+  }, [dispatch]);
 
   const modal = useRef<HTMLIonModalElement>(null);
 
   const closeModal = useCallback(() => {
     modal.current?.dismiss();
   }, []);
-  useEffect(() => {
-    return closeModal;
-  }, [closeModal]);
 
-  return showBadge ? (
+  return !onlineStatus ? (
     <>
       <IonFab
         className="online-fab"

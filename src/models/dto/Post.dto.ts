@@ -1,3 +1,4 @@
+import { CommentDto } from "./Comment.dto";
 import { UserDto } from "./User.dto";
 
 export interface PostDto {
@@ -7,4 +8,5 @@ export interface PostDto {
   title: string;
 
   author?: UserDto;
+  comments?: CommentDto[];
 }

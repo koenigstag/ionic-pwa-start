@@ -1,4 +1,4 @@
-import { Redirect, Route } from 'react-router';
+import { Route } from 'react-router';
 import HomePage from './pages/Home';
 import FavoriteBlogsPage from './pages/FavoriteBlogs';
 import ProfilePage from './pages/Profile';
